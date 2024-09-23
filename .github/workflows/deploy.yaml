@@ -20,9 +20,13 @@ jobs:
       - name: Deploy Docker image to server
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@13.233.83.92 << 'EOF'
+            
             # Stop and remove the existing container if it exists
             docker stop java-app || true
             docker rm java-app || true
+            
+            # Pull the image from repo
+            docker pull ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}"
             
             # Run the new Docker container
             docker run -itd --name java-app -p 800:8080 ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}"
