@@ -11,8 +11,6 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.build.outputs.image_tag }}
 
     steps:
       - name: Checkout code
@@ -28,14 +26,30 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build the Docker image
-        id: build
         run: |
-          TAG="version${GITHUB_RUN_NUMBER}"  
-          echo "Building Docker image with tag: $TAG"
-          docker build -t ckdh0799/java-app:$TAG .
+          docker buildx build \
+            --file build/Dockerfile \
+            --tag ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}"
 
       - name: Push the Docker image
         run: |
-          TAG="version${GITHUB_RUN_NUMBER}"
-          echo "Pushing image with tag: $TAG"
-          docker push ckdh0799/java-app:$TAG
+          docker push ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}"
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+      - name: Deploy Docker image to server
+        run: |   
+          ssh -o StrictHostKeyChecking=no ubuntu@13.200.254.232 << 'EOF'
+            # Stop and remove the existing container if it exists
+            docker stop java-app || true
+            docker rm java-app || true
+            
+            # Pull the latest Docker image from Docker Hub
+            docker pull ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}
+            
+            # Run the new Docker container
+            docker run -itd --name java-app -p 800:8080 ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}
+          EOF
