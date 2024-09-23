@@ -30,10 +30,12 @@ jobs:
       - name: Build the Docker image
         id: build
         run: |
-          TAG="version${GITHUB_RUN_NUMBER}"  # Use the current workflow's run number
+          TAG="version${GITHUB_RUN_NUMBER}"  
+          echo "Building Docker image with tag: $TAG"
           docker build -t ckdh0799/java-app:$TAG .
-          echo "::set-output name=image_tag::$TAG"
 
       - name: Push the Docker image
         run: |
+          TAG="version${GITHUB_RUN_NUMBER}"
+          echo "Pushing image with tag: $TAG"
           docker push ckdh0799/java-app:$TAG
