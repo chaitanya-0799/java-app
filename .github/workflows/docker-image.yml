@@ -26,8 +26,9 @@ jobs:
 
       - name: Build the Docker image
         run: |
-          docker build -t ckdh0799/java-app:version(${GITHUB_RUN_NUMBER}) .
+          docker build -t ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}" .
 
       - name: Push the Docker image
         run: |
-          docker push ckdh0799/java-app:version(${GITHUB_RUN_NUMBER}) 
+          docker push ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}"
+ 
