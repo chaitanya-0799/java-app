@@ -11,6 +11,9 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.build.outputs.image_tag }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,10 +28,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build the Docker image
+        id: build
         run: |
-          docker build -t ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}" .
+          TAG="version${GITHUB_RUN_NUMBER}"  # Use the current workflow's run number
+          docker build -t ckdh0799/java-app:$TAG .
+          echo "::set-output name=image_tag::$TAG"
 
       - name: Push the Docker image
         run: |
-          docker push ckdh0799/java-app:version"${GITHUB_RUN_NUMBER}"
- 
+          docker push ckdh0799/java-app:$TAG
