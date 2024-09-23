@@ -25,7 +25,7 @@ jobs:
       - name: Deploy Docker image to server
         run: |
           echo "Using image tag: $IMAGE_TAG"
-          ssh -o StrictHostKeyChecking=no ubuntu@13.233.83.92 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@13.200.254.232 << 'EOF'
             # Stop and remove the existing container if it exists
             docker stop java-app || true
             docker rm java-app || true
